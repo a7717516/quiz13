@@ -10,6 +10,7 @@ import com.example.quiz13.service.ifs.FeedBackService;
 import com.example.quiz13.vo.BasicRes;
 import com.example.quiz13.vo.CreateReq;
 import com.example.quiz13.vo.FillinReq;
+import com.example.quiz13.vo.SearchIdReq;
 
 import jakarta.validation.Valid;
 
@@ -23,6 +24,11 @@ public class FeedbackController {
 	@PostMapping(value ="quiz/fillin")
 	public BasicRes fillin(@Valid @RequestBody FillinReq req) {
 		return feedBackService.fillin(req);
+		
+	}
+	@PostMapping(value ="quiz/feedback")
+	public BasicRes feedback(@RequestBody SearchIdReq req) {
+		return feedBackService.feedback(req.getId());
 		
 	}
 }
