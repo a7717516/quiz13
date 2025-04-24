@@ -112,7 +112,7 @@ public class FeedBackServiceImpl implements FeedBackService{
 					// 比對同一題的答案是否都在選項中
 					boolean checkRes = checkAnswer(optionsList, answerList);
 					if(!checkRes) {
-						return new SearchRes(ResMessage.ANSWER_OPTION_MISMATCH.getCode(), //
+						return new BasicRes(ResMessage.ANSWER_OPTION_MISMATCH.getCode(), //
 								ResMessage.ANSWER_OPTION_MISMATCH.getMessage());
 					}
 				}
@@ -158,82 +158,64 @@ public class FeedBackServiceImpl implements FeedBackService{
 		return true;
 	}
 	@Override
-	public FeedbackRes feedback(int quizId) {
-		//檢查參數
-		if(quizId <= 0) {
-			return new FeedbackRes(ResMessage.PARAM_QUIZ_ID_ERROR.getCode(), //
-					ResMessage.PARAM_QUIZ_ID_ERROR.getMessage());
-		}
-		// 撈資料
-		List<FeedbackDto> res = feedbackDao.selectFeedback(quizId);
-		// 整理資料 :透過相同的EMAIL把問題和回答整理再一起
-		Map<String, List<QuesAnswervo>> map = new HashMap<>();
-		
-		String quizName = "";
-		String description ="";
-		for(FeedbackDto dto : res) {
-			quizName = dto.getQuizName();
-			description = dto.getDescription();
-			String email = dto.getEmail();
-			
-			if(map.containsKey(email)) {
-				// 若 map 中已存在相同的 key(email),就從 map 中把對應的 value 取出
-				List<QuesAnswervo> voList = map.get(email); 
-				QuesAnswervo vo = new QuesAnswervo();
-				vo.setQuesId(dto.getQuesId());
-				vo.setQuesName(dto.getQuesName());
-			try {
-				// 將DB 中的answer String 轉成List<String>
-				List<String>answerList = mapper.readValue(dto.getAnswer(), new TypeReference<>() {
-				});
-				vo.setAnswers(answerList);
-			} catch (Exception e) {
-				return new FeedbackRes(ResMessage.ANSWER_PARSE_REEOR.getCode(), //
-						ResMessage.ANSWER_PARSE_REEOR.getMessage());
-			}voList.add(vo);
-			map.put(email, voList);
-			}else {
-				
-			List<QuesAnswervo> voList = new ArrayList<>();
-			QuesAnswervo vo = new QuesAnswervo();
-			vo.setQuesId(dto.getQuesId());
-			vo.setQuesName(dto.getQuesName());
-			try {
-				// 將DB 中的answer String 轉成List<String>
-				List<String>answerList = mapper.readValue(dto.getAnswer(), new TypeReference<>() {
-				});
-				vo.setAnswers(answerList);
-			} catch (Exception e) {
-				return new FeedbackRes(ResMessage.ANSWER_PARSE_REEOR.getCode(), //
-						ResMessage.ANSWER_PARSE_REEOR.getMessage());
-			}
-			voList.add(vo);
-			map.put(email, voList);
-			}
-			
-			
-			
-		}
-		List<FeedbackVo> feedbackList = new ArrayList<>();
-		a: for(FeedbackDto dto : res) {
-			String email = dto.getEmail();
-			for(FeedbackVo vo : feedbackList) {
-				if(email.equalsIgnoreCase(vo.getEmail())) {
-					continue a;
-				}
-			}
-			FeedbackVo feedbackVo = new FeedbackVo();
-			feedbackVo.setUsername(dto.getUsername());
-			feedbackVo.setPhone(dto.getPhone());
-			feedbackVo.setEmail(dto.getEmail());
-			feedbackVo.setAge(dto.getAge());
-			feedbackVo.setFillinDate(dto.getfillinDate());
-			feedbackVo.setQuesAnswerList(map.get(dto.getEmail()));
-			feedbackList.add(feedbackVo);
-		}
-		return new FeedbackRes(ResMessage.SUCCESS.getCode(), //
-				ResMessage.SUCCESS.getMessage(), quizName, description, feedbackList);	
-		}
+	 public FeedbackRes feedback(int quizId) {
+	  // 檢查參數
+	  if (quizId <= 0) {
+	   return new FeedbackRes(ResMessage.PARAM_QUIZ_ID_ERROR.getCode(), //
+	     ResMessage.PARAM_QUIZ_ID_ERROR.getMessage());
+	  }
+	  // 撈資料
+	  List<FeedbackDto> res = feedbackDao.selectFeedback(quizId);
+	  // 整理資料：透過相同的 email 把問題和回答整理在一起
+	  // MAP<String, List<QuesAnswerVo>> 中的key 是放email
+	  Map<String, List<QuesAnswervo>> map = new HashMap<>();
+	  String quizName = "";
+	  String description = "";
+	  for (FeedbackDto dto : res) {
+	   quizName = dto.getQuizName();
+	   description = dto.getDescription();
+	   String email = dto.getEmail();
+	   List<QuesAnswervo> voList = new ArrayList<>();
+	   if (map.containsKey(email)) {
+	    // 若 map 中已存在相同的 key(email)，就從 map 中把對應的 value 取出
+	    voList = map.get(email);
+	   }
+	   QuesAnswervo vo = new QuesAnswervo();
+	   vo.setQuesId(dto.getQuesId());
+	   vo.setQuesName(dto.getQuesName());
+	   try {
+	    // 將DB 中的 answer String 轉成 List<String>
+	    List<String> answerList = mapper.readValue(dto.getAnswer(), new TypeReference<>() {
+	    });
+	    vo.setAnswers(answerList);
+	   } catch (Exception e) {
+	    return new FeedbackRes(ResMessage.ANSWER_PARSE_REEOR.getCode(), //
+	      ResMessage.ANSWER_PARSE_REEOR.getMessage());
+	   }
+	   voList.add(vo);
+	   map.put(email, voList);
+	  }
+
+	  List<FeedbackVo> feedbackList = new ArrayList<>();
+	  a: for (FeedbackDto dto : res) {
+	   String email = dto.getEmail();
+	   for (FeedbackVo vo : feedbackList) {
+	    if (email.equalsIgnoreCase(vo.getEmail())) {	    		    	
+	    		continue a;	    	
+	    }	     
+	   }
+	   FeedbackVo feedbackVo = new FeedbackVo();
+	   feedbackVo.setUsername(dto.getUsername());
+	   feedbackVo.setPhone(dto.getPhone());
+	   feedbackVo.setEmail(dto.getEmail());
+	   feedbackVo.setAge(dto.getAge());
+	   feedbackVo.setFillinDate(dto.getfillinDate());
+	   feedbackVo.setQuesAnswerList(map.get(dto.getEmail()));
+	   feedbackList.add(feedbackVo);
+	  }
+	  return new FeedbackRes(ResMessage.SUCCESS.getCode(), //
+	    ResMessage.SUCCESS.getMessage(), quizName, description, feedbackList);
+	 }
 
 	 @Override
 	 public StatisticsRes statistics(int quizId) {

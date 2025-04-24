@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.quiz13.service.ifs.FeedBackService;
 import com.example.quiz13.vo.BasicRes;
 import com.example.quiz13.vo.CreateReq;
+import com.example.quiz13.vo.FeedbackRes;
 import com.example.quiz13.vo.FillinReq;
 import com.example.quiz13.vo.SearchIdReq;
 
@@ -27,7 +28,12 @@ public class FeedbackController {
 		
 	}
 	@PostMapping(value ="quiz/feedback")
-	public BasicRes feedback(@RequestBody SearchIdReq req) {
+	public FeedbackRes feedback(@RequestBody SearchIdReq req) {
+		return feedBackService.feedback(req.getId());
+		
+	}
+	@PostMapping(value ="quiz/statistics")
+	public BasicRes statistics(@RequestBody SearchIdReq req) {
 		return feedBackService.feedback(req.getId());
 		
 	}

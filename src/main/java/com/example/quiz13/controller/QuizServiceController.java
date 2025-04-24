@@ -1,6 +1,9 @@
 package com.example.quiz13.controller;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,12 +58,14 @@ public class QuizServiceController {
 	}
 	@PostMapping(value ="quiz/search")
 	public SearchRes getAll(@RequestBody SearchReq req) {
+		req.init();
 		return quizService.getAll(req);
 	}
 	@PostMapping(value ="quiz/getQuizId")
 	public SearchRes getQuizId(@RequestBody SearchIdReq req) {
 		return quizService.getQuiz(req);
 	}
+	
 	@PostMapping(value ="quiz/delete")
 	public BasicRes Delete(@Valid @RequestBody DeleteReq req) {
 	return quizService.Delete(req);
